@@ -1,0 +1,401 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Jornada da Analista de Dados</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: mapa de trilha vertical (esquerda, fixo) + diário da fase (direita); no celular, mapa em cima */
+:root {
+  --bg: #EAF1F4;
+  --paper: #FFFFFF;
+  --ink: #1C2A47;
+  --muted: #5C6B86;
+  --line: #CBD7E0;
+  --land: #D7E6DA;
+  --water: #CFE2EE;
+  --c1: #23935F; --c1s: #DDF2E7;
+  --c2: #2F6FDB; --c2s: #DFE9FB;
+  --c3: #D9930B; --c3s: #FBF0D6;
+  --c4: #7A4BD0; --c4s: #ECE3FA;
+  --gold: #E9A923;
+  --f-display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --f-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121A2B; --paper: #1B2540; --ink: #E8EEF8; --muted: #9AA8C2; --line: #2E3B5C;
+  --land: #1E3A33; --water: #1A2D47;
+  --c1: #4CC48C; --c1s: #18372A; --c2: #6E9BF0; --c2s: #1B2B4F; --c3: #F0B640; --c3s: #3A2E12; --c4: #A786EC; --c4s: #2C2148;
+  --gold: #F0B640; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121A2B; --paper: #1B2540; --ink: #E8EEF8; --muted: #9AA8C2; --line: #2E3B5C;
+  --land: #1E3A33; --water: #1A2D47;
+  --c1: #4CC48C; --c1s: #18372A; --c2: #6E9BF0; --c2s: #1B2B4F; --c3: #F0B640; --c3s: #3A2E12; --c4: #A786EC; --c4s: #2C2148;
+  --gold: #F0B640; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 24px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+header.top { display: grid; gap: 14px; margin-bottom: 20px; }
+.eyebrow { font-weight: 800; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(28px, 5vw, 42px); line-height: 1.05; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; max-width: 62ch; }
+.hud { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; background: var(--paper); border: 2px solid var(--line); border-radius: 16px; padding: 12px 16px; }
+.lvl { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.lvl-badge { width: 40px; height: 40px; border-radius: 50%; background: var(--gold); color: #2A1E00; display: grid; place-items: center; font-family: var(--f-display); font-weight: 700; font-size: 18px; flex: none; }
+.lvl b { font-family: var(--f-display); font-weight: 600; font-size: 17px; display: block; line-height: 1.1; }
+.lvl small { color: var(--muted); font-size: 12.5px; }
+.xp { flex: 1 1 220px; min-width: 0; }
+.xp-row { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar { height: 12px; border-radius: 99px; background: var(--bg); border: 2px solid var(--line); overflow: hidden; margin-top: 4px; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--c1), var(--c2), var(--c3), var(--c4)); transition: width .5s ease; }
+.reset { font: 700 12.5px var(--f-body); color: var(--muted); background: none; border: 2px solid var(--line); border-radius: 10px; padding: 6px 10px; cursor: pointer; }
+.reset.armed { color: #fff; background: #C2413A; border-color: #C2413A; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 820px) { .layout { grid-template-columns: minmax(0, 1fr); } .map-card { max-width: 420px; margin: 0 auto; width: 100%; } }
+
+.map-card { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); background: var(--water); border-radius: 22px; border: 2px solid var(--line); overflow: hidden; }
+@media (max-width: 820px) { .map-card { position: static; } }
+.map-card svg { display: block; width: 100%; height: auto; }
+.legend { display: flex; justify-content: center; gap: 14px; font-size: 12px; color: var(--muted); padding: 8px 12px 12px; background: var(--water); }
+
+.station { cursor: pointer; outline: none; }
+.station .ring { fill: var(--paper); stroke-width: 4; transition: transform .2s; transform-box: fill-box; transform-origin: center; }
+.station:hover .ring, .station:focus-visible .ring { transform: scale(1.08); }
+.station:focus-visible .focus { stroke: var(--ink); }
+.station.sel .ring { stroke-width: 6; }
+.station text { font-family: var(--f-display); fill: var(--ink); }
+.st-name { font-size: 15px; font-weight: 600; }
+.st-months { font-size: 11.5px; font-weight: 500; fill: var(--muted) !important; }
+.st-num { font-size: 20px; font-weight: 700; }
+.token { transition: transform .7s cubic-bezier(.5,1.6,.4,1); }
+@media (prefers-reduced-motion: reduce) { .token, .bar i, .station .ring { transition: none; } }
+
+/* Painel da fase */
+.panel { background: var(--paper); border: 2px solid var(--line); border-radius: 22px; overflow: hidden; min-width: 0; }
+.p-head { padding: 22px 22px 18px; background: var(--soft); border-bottom: 2px solid var(--line); }
+.p-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.tag { font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 4px 10px; border-radius: 99px; background: var(--paper); color: var(--accent); border: 2px solid var(--accent); }
+.tag.solid { background: var(--accent); color: var(--paper); }
+.p-head h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(22px, 3.4vw, 30px); margin: 0 0 4px; line-height: 1.1; text-wrap: balance; }
+.p-head .course { font-weight: 800; color: var(--accent); margin: 0 0 6px; }
+.p-head p { margin: 0; max-width: 62ch; }
+.p-body { padding: 20px 22px 24px; display: grid; gap: 22px; }
+.blk h3 { font-family: var(--f-display); font-weight: 600; font-size: 18px; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+.blk h3 .ic { width: 26px; height: 26px; border-radius: 8px; background: var(--soft); color: var(--accent); display: grid; place-items: center; font-size: 14px; font-weight: 800; flex: none; }
+.hint { color: var(--muted); font-size: 13px; margin: -4px 0 10px; }
+
+.missions { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.missions label { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border: 2px solid var(--line); border-radius: 12px; cursor: pointer; transition: background .15s, border-color .15s; }
+.missions label:hover { border-color: var(--accent); }
+.missions input { appearance: none; width: 22px; height: 22px; border: 2.5px solid var(--accent); border-radius: 7px; flex: none; margin: 1px 0 0; display: grid; place-items: center; cursor: pointer; background: var(--paper); }
+.missions input:checked { background: var(--accent); }
+.missions input:checked::after { content: ""; width: 6px; height: 11px; border: solid var(--paper); border-width: 0 3px 3px 0; transform: translateY(-1px) rotate(45deg); }
+.missions input:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.missions .done { background: var(--soft); border-color: transparent; }
+.missions .done span { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--accent); }
+.xp-chip { margin-left: auto; font: 500 11.5px var(--f-mono); color: var(--accent); white-space: nowrap; padding-top: 2px; }
+
+.boss { border: 2.5px dashed var(--accent); border-radius: 14px; padding: 14px 16px; display: flex; gap: 14px; align-items: flex-start; }
+.boss .flag { font-family: var(--f-display); font-weight: 700; background: var(--accent); color: var(--paper); border-radius: 10px; padding: 4px 10px; font-size: 13px; flex: none; }
+.boss p { margin: 0; }
+.boss label { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-weight: 700; font-size: 13.5px; cursor: pointer; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 500 13px var(--f-mono); color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 10px; padding: 7px 10px; cursor: pointer; text-align: left; max-width: 100%; overflow-wrap: anywhere; }
+.chip:hover, .chip:focus-visible { border-color: var(--accent); outline: none; }
+.chip.copied { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+
+.checks { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.checks li { display: flex; gap: 10px; align-items: flex-start; }
+.checks li::before { content: "?"; font-family: var(--f-display); font-weight: 700; font-size: 12px; width: 20px; height: 20px; border-radius: 50%; background: var(--soft); color: var(--accent); display: grid; place-items: center; flex: none; margin-top: 2px; }
+.tip { background: var(--bg); border-radius: 14px; padding: 12px 14px; font-size: 14px; }
+.tip b { color: var(--accent); }
+.where { font-size: 14px; margin: 0; }
+
+.nav { display: flex; justify-content: space-between; gap: 10px; padding: 0 22px 22px; }
+.nav button { font: 700 14px var(--f-body); border: 2px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 12px; padding: 9px 14px; cursor: pointer; }
+.nav button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.nav button:disabled { opacity: .4; cursor: default; }
+
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-weight: 700; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100vw - 32px); }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Do Trade Marketing à vaga · 12 meses</span>
+    <h1>Jornada da Analista de Dados</h1>
+    <p class="sub">Toque numa estação do mapa para ver o curso, as palavras-chave e as missões. Marque o que for concluindo: o progresso fica salvo neste navegador.</p>
+    <div class="hud">
+      <div class="lvl"><div class="lvl-badge" id="lvlNum">0</div><div><b id="lvlName">Novata do Trade</b><small id="lvlNext">Próximo nível: concluir a Vila das Planilhas</small></div></div>
+      <div class="xp"><div class="xp-row"><span>XP da jornada</span><span id="xpTxt">0 / 0</span></div><div class="bar"><i id="xpBar"></i></div></div>
+      <button class="reset" id="reset" type="button">Recomeçar</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="map-card">
+      <svg id="map" viewBox="0 0 360 830" role="group" aria-label="Mapa da jornada com 4 estações"></svg>
+      <div class="legend"><span>━ caminho feito</span><span>┅ caminho a percorrer</span></div>
+    </div>
+    <section class="panel" id="panel" aria-live="polite"></section>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const STATIONS = [
+  { id: 'excel', n: 1, color: 'c1', name: 'Vila das Planilhas', months: 'Meses 1 a 3', x: 92, y: 200,
+    course: 'Excel avançado + Estatística básica',
+    intro: 'Primeiro curso a comprar. Ela já usa Excel no Trade, então aqui o avanço é rápido. Em paralelo, um curso curto e gratuito de estatística.',
+    missions: ['Tabela dinâmica e gráfico dinâmico', 'PROCX, SOMASES, CONT.SES e SE', 'Power Query: importar e limpar dados', 'Estatística: média, mediana, moda e desvio padrão', 'Estatística: percentis, correlação e amostra'],
+    boss: 'Montar um painel de sell-out por loja, região e mês com uma base pública de vendas do Kaggle.',
+    keywords: ['Excel avançado para análise de dados', 'Excel Power Query do zero', 'tabela dinâmica dashboard Excel', 'estatística descritiva para iniciantes', 'estatística para análise de dados sem matemática avançada'],
+    checks: ['Tem arquivos de exercício para baixar?', 'Ensina Power Query? Se não ensinar, procure outro.', 'As aulas usam Excel 365 ou 2021+?', 'As avaliações recentes elogiam a didática?'],
+    where: 'Udemy (espere promoção), Fundação Bradesco Escola Virtual e Khan Academy (gratuitos), Coursera.',
+    tip: '<b>Poder especial:</b> ela já entende sell-in, sell-out, positivação e ruptura. Use dados desse mundo em todos os projetos.' },
+  { id: 'sql', n: 2, color: 'c2', name: 'Porto do SQL', months: 'Meses 4 a 6', x: 268, y: 360,
+    course: 'SQL para análise de dados, do zero',
+    intro: 'Analista passa o dia escrevendo SELECT, não criando bancos. O curso certo ensina a fazer perguntas para o banco.',
+    missions: ['SELECT, WHERE, ORDER BY e LIMIT', 'COUNT, SUM, AVG com GROUP BY e HAVING', 'JOINs (INNER e LEFT)', 'CASE WHEN, funções de data e texto', 'Subconsultas e CTEs (WITH)', 'Funções de janela: ROW_NUMBER, RANK, SUM OVER'],
+    boss: 'Carregar a base de vendas num banco e responder 10 perguntas de negócio: top 10 produtos, ticket médio por região, lojas que caíram mês a mês.',
+    keywords: ['SQL para análise de dados do zero', 'SQL para iniciantes PostgreSQL', 'SQL JOIN GROUP BY exercícios', 'SQL window functions para analistas', 'SQL para negócios'],
+    checks: ['O foco é consulta e análise, não administração de banco (DBA)?', 'Tem exercícios com resposta e um banco de exemplo?', 'Chega até CTE e funções de janela? Se parar no JOIN, é curto demais.'],
+    where: 'Udemy e Coursera. Para treinar de graça: SQLBolt e os desafios de SQL do HackerRank.',
+    tip: '<b>Sem confusão com Java:</b> SQL é uma linguagem de consulta, bem diferente. E ainda ajuda nas matérias de banco do ADS. PostgreSQL ou MySQL, tanto faz.' },
+  { id: 'bi', n: 3, color: 'c3', name: 'Torre dos Dashboards', months: 'Meses 7 a 9', x: 92, y: 520,
+    course: 'Power BI do zero (não Tableau)',
+    intro: 'Power BI é o mais pedido nas vagas no Brasil, o Desktop é gratuito e ela já chega sabendo Power Query.',
+    missions: ['Conectar o Power BI ao banco SQL', 'Modelo estrela: tabelas fato e dimensão', 'DAX básico: CALCULATE, SUM, DIVIDE', 'Inteligência de tempo: mês anterior e acumulado no ano', 'Montar páginas que contam uma história', 'Publicar no Power BI Service'],
+    boss: 'Dashboard comercial ligado ao banco da fase anterior, com vendas, metas, positivação de PDV e ruptura.',
+    keywords: ['Power BI do zero ao avançado', 'DAX para iniciantes', 'modelagem de dados Power BI modelo estrela', 'Power BI dashboard comercial vendas', 'PL-300 Power BI Data Analyst'],
+    checks: ['Ensina modelagem e DAX, não só arrastar gráficos?', 'Foi gravado com a interface atual (2025 ou 2026)?', 'Tem um projeto final de ponta a ponta?', 'Não é só "simulado PL-300"? Simulado serve para a prova, não para aprender.'],
+    where: 'Udemy, YouTube e a trilha gratuita do Microsoft Learn para a PL-300.',
+    tip: '<b>Certificação opcional:</b> Power BI Data Analyst Associate (exame PL-300). A renovação é anual e gratuita. Tableau só se as vagas que ela mirar pedirem.' },
+  { id: 'py', n: 4, color: 'c4', name: 'Floresta do Python', months: 'Meses 10 a 12', x: 268, y: 680, gate: 'Abre no mês 10',
+    course: 'Python para dados (pandas) + portfólio',
+    intro: 'Só agora, com o Java da faculdade mais firme. Python, não R: é o que mais aparece nas vagas. O foco é análise, não programação geral.',
+    missions: ['Básico rápido: listas, dicionários, laços, funções', 'Usar Jupyter Notebook ou Google Colab', 'pandas: ler CSV/Excel, filtrar e agrupar', 'pandas: juntar tabelas e tratar valores faltando', 'Gráficos com matplotlib ou seaborn', 'Portfólio: 3 projetos no GitHub com README'],
+    boss: 'Análise exploratória em Python de uma base de varejo ou promoções. Junto com o dashboard e o projeto SQL, fecha o portfólio.',
+    keywords: ['Python para análise de dados iniciantes', 'pandas do zero', 'análise exploratória de dados Python', 'Python para analistas de dados Excel', 'projeto de análise de dados portfólio'],
+    checks: ['O foco é pandas e análise, não web, jogos ou orientação a objetos?', 'Usa bases reais e termina com um projeto?', 'Não é "ciência de dados / machine learning"? Isso é o passo depois.'],
+    where: 'Udemy, Coursera e o Certificado de Análise de Dados do Google (tem versão em português).',
+    tip: '<b>Atenção:</b> o certificado do Google tem um módulo de R. Se ela fizer antes do mês 10, deixe esse módulo por último.' }
+];
+const START = { x: 180, y: 52 }, END = { x: 180, y: 790 };
+const KEY = 'jornada-analista-v1';
+const XP_M = 10, XP_B = 30;
+
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { state = {}; }
+let sel = state._sel || 'excel';
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ ...state, _sel: sel })); } catch (e) {} };
+const done = (st, i) => !!state[st.id + ':' + i];
+const bossDone = st => !!state[st.id + ':boss'];
+const stDone = st => st.missions.every((_, i) => done(st, i)) && bossDone(st);
+const stCount = st => st.missions.filter((_, i) => done(st, i)).length + (bossDone(st) ? 1 : 0);
+
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs = {}, parent) => {
+  const e = document.createElementNS(NS, tag); let style = attrs.style || '';
+  for (const k in attrs) {
+    if (k === 'style') continue;
+    if ((k === 'fill' || k === 'stroke') && String(attrs[k]).includes('var(')) style += `;${k}:${attrs[k]}`;
+    else e.setAttribute(k, attrs[k]);
+  }
+  if (style) e.setAttribute('style', style);
+  if (parent) parent.appendChild(e); return e;
+};
+const css = v => getComputedStyle(document.documentElement).getPropertyValue('--' + v).trim();
+
+function legPath(a, b) {
+  const my = (a.y + b.y) / 2;
+  return `M${a.x},${a.y} C${a.x},${my} ${b.x},${my} ${b.x},${b.y}`;
+}
+
+function drawMap() {
+  const svg = document.getElementById('map');
+  svg.innerHTML = '';
+  // ilhas de cada região
+  el('rect', { x: 0, y: 0, width: 360, height: 830, fill: 'var(--water)' }, svg);
+  const blobs = [[60, 40, 240, 110], [20, 120, 230, 160], [130, 285, 220, 160], [20, 445, 230, 160], [130, 605, 220, 160], [80, 740, 200, 80]];
+  blobs.forEach(([x, y, w, h]) => el('rect', { x, y, width: w, height: h, rx: 60, fill: 'var(--land)' }, svg));
+  // detalhes do mundo de cada estação
+  const deco = g => g;
+  // árvores (Floresta do Python)
+  [[180, 640], [200, 720], [320, 625], [325, 735], [160, 690]].forEach(([x, y]) => { el('circle', { cx: x, cy: y, r: 11, fill: 'var(--c4)', opacity: .35 }, svg); el('rect', { x: x - 1.5, y: y + 8, width: 3, height: 8, fill: 'var(--c4)', opacity: .5 }, svg); });
+  // ondas (Porto do SQL)
+  [[40, 330], [60, 405], [330, 270]].forEach(([x, y]) => el('path', { d: `M${x},${y} q6,-6 12,0 t12,0 t12,0`, fill: 'none', stroke: 'var(--c2)', 'stroke-width': 2.5, 'stroke-linecap': 'round', opacity: .55 }, svg));
+  // grade de planilha (Vila)
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) el('rect', { x: 180 + i * 14, y: 160 + j * 11, width: 14, height: 11, fill: 'none', stroke: 'var(--c1)', 'stroke-width': 1.5, opacity: .5 }, svg);
+  // barrinhas (Torre dos Dashboards)
+  [[175, 26], [189, 40], [203, 18], [217, 50]].forEach(([x, h]) => el('rect', { x, y: 560 - h, width: 9, height: h, rx: 2, fill: 'var(--c3)', opacity: .5 }, svg));
+
+  // trilha
+  const pts = [START, ...STATIONS, END];
+  const firstOpen = STATIONS.findIndex(s => !stDone(s));
+  const reached = firstOpen === -1 ? STATIONS.length : firstOpen; // estações concluídas
+  for (let i = 0; i < pts.length - 1; i++) {
+    const d = legPath(pts[i], pts[i + 1]);
+    el('path', { d, fill: 'none', stroke: 'var(--paper)', 'stroke-width': 12, 'stroke-linecap': 'round' }, svg);
+    const walked = i <= reached - 1 || (i === 0);
+    el('path', { d, fill: 'none', stroke: walked ? 'var(--ink)' : 'var(--muted)', 'stroke-width': walked ? 4 : 3, 'stroke-dasharray': walked ? 'none' : '2 9', 'stroke-linecap': 'round', opacity: walked ? .85 : .7 }, svg);
+  }
+
+  // partida
+  const s = el('g', {}, svg);
+  el('rect', { x: START.x - 78, y: START.y - 22, width: 156, height: 44, rx: 22, fill: 'var(--paper)', stroke: 'var(--line)', 'stroke-width': 2 }, s);
+  const t1 = el('text', { x: START.x, y: START.y - 2, 'text-anchor': 'middle', 'font-family': 'Fredoka, sans-serif', 'font-size': 14, 'font-weight': 600, fill: 'var(--ink)' }, s); t1.textContent = 'Partida';
+  const t2 = el('text', { x: START.x, y: START.y + 14, 'text-anchor': 'middle', 'font-family': 'Nunito, sans-serif', 'font-size': 11, fill: 'var(--muted)' }, s); t2.textContent = 'Trade Marketing + ADS';
+
+  // chegada
+  const f = el('g', {}, svg);
+  const allDone = reached === STATIONS.length;
+  el('rect', { x: END.x - 92, y: END.y - 24, width: 184, height: 48, rx: 24, fill: allDone ? 'var(--gold)' : 'var(--paper)', stroke: 'var(--gold)', 'stroke-width': 3 }, f);
+  const t3 = el('text', { x: END.x, y: END.y - 3, 'text-anchor': 'middle', 'font-family': 'Fredoka, sans-serif', 'font-size': 15, 'font-weight': 700, fill: allDone ? '#2A1E00' : 'var(--ink)' }, f); t3.textContent = 'Chegada';
+  const t4 = el('text', { x: END.x, y: END.y + 14, 'text-anchor': 'middle', 'font-family': 'Nunito, sans-serif', 'font-size': 11, 'font-weight': 700, fill: allDone ? '#2A1E00' : 'var(--muted)' }, f); t4.textContent = 'Vaga de Analista de Dados Jr.';
+
+  // estações
+  STATIONS.forEach(st => {
+    const g = el('g', { class: 'station' + (st.id === sel ? ' sel' : ''), tabindex: 0, role: 'button', 'aria-label': `${st.name}, ${st.months}` }, svg);
+    const left = st.x < 180;
+    const cnt = stCount(st), tot = st.missions.length + 1;
+    el('circle', { class: 'focus', cx: st.x, cy: st.y, r: 36, fill: 'none', stroke: 'transparent', 'stroke-width': 3 }, g);
+    el('circle', { class: 'ring', cx: st.x, cy: st.y, r: 28, stroke: `var(--${st.color})`, fill: stDone(st) ? `var(--${st.color})` : 'var(--paper)' }, g);
+    // arco de progresso
+    if (cnt > 0 && !stDone(st)) {
+      const r = 34, c = 2 * Math.PI * r;
+      el('circle', { cx: st.x, cy: st.y, r, fill: 'none', stroke: `var(--${st.color})`, 'stroke-width': 4, 'stroke-dasharray': `${c * cnt / tot} ${c}`, transform: `rotate(-90 ${st.x} ${st.y})`, 'stroke-linecap': 'round' }, g);
+    }
+    const num = el('text', { class: 'st-num', x: st.x, y: st.y + 7, 'text-anchor': 'middle', style: `fill:${stDone(st) ? 'var(--paper)' : `var(--${st.color})`}` }, g);
+    num.textContent = stDone(st) ? '✓' : st.n;
+    const lx = left ? st.x + 44 : st.x - 44, anchor = left ? 'start' : 'end';
+    const nm = el('text', { class: 'st-name', x: lx, y: st.y - 2, 'text-anchor': anchor }, g); nm.textContent = st.name;
+    const mo = el('text', { class: 'st-months', x: lx, y: st.y + 15, 'text-anchor': anchor }, g); mo.textContent = st.gate ? `${st.months} · ${st.gate}` : `${st.months} · ${cnt}/${tot}`;
+    const go = () => { sel = st.id; save(); render(); if (window.innerWidth <= 820) document.getElementById('panel').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); };
+    g.addEventListener('click', go);
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+
+  // peão: fica na estação em andamento
+  const where = reached === STATIONS.length ? END : STATIONS[reached];
+  const tok = el('g', { class: 'token', transform: `translate(${where.x + (reached === STATIONS.length ? 0 : 0)},${where.y - (reached === STATIONS.length ? 40 : 46)})` }, svg);
+  el('ellipse', { cx: 0, cy: 22, rx: 9, ry: 3, fill: 'var(--ink)', opacity: .2 }, tok);
+  el('path', { d: 'M0,-14 C9,-14 12,-6 12,0 C12,9 0,20 0,20 C0,20 -12,9 -12,0 C-12,-6 -9,-14 0,-14Z', fill: 'var(--gold)', stroke: 'var(--ink)', 'stroke-width': 2 }, tok);
+  el('circle', { cx: 0, cy: -1, r: 4.5, fill: 'var(--ink)' }, tok);
+}
+
+const LEVELS = ['Novata do Trade', 'Mestra das Planilhas', 'Domadora de SQL', 'Arquiteta de Dashboards', 'Analista de Dados'];
+
+function renderHud() {
+  const total = STATIONS.reduce((a, s) => a + s.missions.length * XP_M + XP_B, 0);
+  const got = STATIONS.reduce((a, s) => a + s.missions.filter((_, i) => done(s, i)).length * XP_M + (bossDone(s) ? XP_B : 0), 0);
+  const lvl = STATIONS.filter(stDone).length;
+  document.getElementById('xpTxt').textContent = `${got} / ${total}`;
+  document.getElementById('xpBar').style.width = (got / total * 100) + '%';
+  document.getElementById('lvlNum').textContent = lvl;
+  document.getElementById('lvlName').textContent = LEVELS[lvl];
+  const next = STATIONS.find(s => !stDone(s));
+  document.getElementById('lvlNext').textContent = next ? `Próximo nível: concluir ${next.name}` : 'Jornada completa. Hora de mandar currículo!';
+}
+
+function esc(s) { return s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+function renderPanel() {
+  const st = STATIONS.find(s => s.id === sel);
+  const p = document.getElementById('panel');
+  p.style.setProperty('--accent', `var(--${st.color})`);
+  p.style.setProperty('--soft', `var(--${st.color}s)`);
+  const idx = STATIONS.indexOf(st);
+  p.innerHTML = `
+    <div class="p-head">
+      <div class="p-tags"><span class="tag solid">Estação ${st.n}</span><span class="tag">${st.months}</span>${st.gate ? `<span class="tag">${st.gate}</span>` : ''}</div>
+      <h2>${st.name}</h2>
+      <p class="course">${st.course}</p>
+      <p>${st.intro}</p>
+    </div>
+    <div class="p-body">
+      <div class="blk">
+        <h3><span class="ic">✓</span>Missões da fase</h3>
+        <p class="hint">O curso escolhido precisa cobrir tudo isso. Cada missão vale ${XP_M} XP.</p>
+        <ul class="missions">${st.missions.map((m, i) => `
+          <li><label class="${done(st, i) ? 'done' : ''}"><input type="checkbox" id="m-${st.id}-${i}" data-k="${st.id}:${i}" ${done(st, i) ? 'checked' : ''}><span>${esc(m)}</span><span class="xp-chip">+${XP_M} XP</span></label></li>`).join('')}
+        </ul>
+      </div>
+      <div class="blk">
+        <div class="boss">
+          <span class="flag">Desafio final</span>
+          <div><p>${esc(st.boss)}</p>
+          <label><input type="checkbox" id="b-${st.id}" data-k="${st.id}:boss" ${bossDone(st) ? 'checked' : ''}> Projeto entregue (+${XP_B} XP)</label></div>
+        </div>
+      </div>
+      <div class="blk">
+        <h3><span class="ic">⌕</span>Palavras-chave para pesquisar</h3>
+        <p class="hint">Toque para copiar e colar na busca da plataforma.</p>
+        <div class="chips">${st.keywords.map(k => `<button type="button" class="chip" data-copy="${esc(k)}">${esc(k)}</button>`).join('')}</div>
+      </div>
+      <div class="blk">
+        <h3><span class="ic">!</span>Antes de se matricular</h3>
+        <ul class="checks">${st.checks.map(c => `<li>${esc(c)}</li>`).join('')}</ul>
+      </div>
+      <div class="blk">
+        <h3><span class="ic">→</span>Onde procurar</h3>
+        <p class="where">${esc(st.where)}</p>
+      </div>
+      <div class="tip">${st.tip}</div>
+    </div>
+    <div class="nav">
+      <button type="button" id="prev" ${idx === 0 ? 'disabled' : ''}>← Estação anterior</button>
+      <button type="button" id="next" ${idx === STATIONS.length - 1 ? 'disabled' : ''}>Próxima estação →</button>
+    </div>`;
+
+  p.querySelectorAll('input[data-k]').forEach(inp => inp.addEventListener('change', () => {
+    const wasDone = stDone(st);
+    if (inp.checked) state[inp.dataset.k] = 1; else delete state[inp.dataset.k];
+    save();
+    if (!wasDone && stDone(st)) toast(`${st.name} concluída! Novo nível: ${LEVELS[STATIONS.filter(stDone).length]}`);
+    render(true);
+  }));
+  p.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+    const txt = b.dataset.copy;
+    const ok = () => { b.classList.add('copied'); toast('Copiado: ' + txt); setTimeout(() => b.classList.remove('copied'), 1200); };
+    try {
+      navigator.clipboard.writeText(txt).then(ok, () => selectText(b));
+    } catch (e) { selectText(b); }
+  }));
+  const go = d => { sel = STATIONS[idx + d].id; save(); render(); };
+  p.querySelector('#prev').addEventListener('click', () => go(-1));
+  p.querySelector('#next').addEventListener('click', () => go(1));
+}
+
+function selectText(node) {
+  const r = document.createRange(); r.selectNodeContents(node);
+  const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  toast('Texto selecionado: use Ctrl+C para copiar');
+}
+
+let tt;
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 2200); }
+
+function render(keepPanelScroll) {
+  const focusId = document.activeElement && document.activeElement.id;
+  drawMap(); renderHud(); renderPanel();
+  if (focusId) { const f = document.getElementById(focusId); if (f) f.focus({ preventScroll: true }); }
+}
+
+const rb = document.getElementById('reset');
+let armed = false, rt;
+rb.addEventListener('click', () => {
+  if (!armed) { armed = true; rb.classList.add('armed'); rb.textContent = 'Toque de novo para apagar'; rt = setTimeout(() => { armed = false; rb.classList.remove('armed'); rb.textContent = 'Recomeçar'; }, 3000); return; }
+  clearTimeout(rt); armed = false; rb.classList.remove('armed'); rb.textContent = 'Recomeçar';
+  state = {}; sel = 'excel'; save(); render(); toast('Progresso apagado');
+});
+
+render();
+</script>
+
+</body></html>
